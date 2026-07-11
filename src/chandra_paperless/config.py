@@ -38,10 +38,19 @@ def _coerce_env_value(key: str, value: str) -> Any:
     field_name = key.lower()
     field = Settings.model_fields[field_name]
     annotation = field.annotation
-    # Pydantic handles bool parsing from strings when receiving a real string,
-    # but model_copy(update=...) performs limited validation. We pre-coerce booleans.
+    # model_copy(update=...) skips pydantic validation, so we pre-coerce types.
     if annotation is bool:
         return value.lower() in {"1", "true", "yes", "on"}
+    if annotation is int:
+        try:
+            return int(value)
+        except ValueError:
+            return value
+    if annotation is float:
+        try:
+            return float(value)
+        except ValueError:
+            return value
     return value
 
 
