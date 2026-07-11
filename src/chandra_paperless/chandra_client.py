@@ -43,8 +43,11 @@ class DatalabClient:
 
     def ocr_bytes(self, data: bytes, filename: str = "document.pdf") -> str:
         """Submit document to Datalab, poll for result, return markdown."""
-        # Step 1: Submit
-        files = {"file": (filename, data)}
+        import mimetypes
+
+        # Step 1: Submit — must include explicit content type or Datalab 400s.
+        mime_type = mimetypes.guess_type(filename)[0] or "application/pdf"
+        files = {"file": (filename, data, mime_type)}
         form_data: dict[str, Any] = {
             "output_format": "markdown",
             "mode": "balanced",

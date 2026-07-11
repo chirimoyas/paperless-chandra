@@ -120,6 +120,9 @@ def test_datalab_ocr_bytes(datalab_client):
     assert text == "# OCR Result\n\nSome text"
     # Verify X-API-Key header was sent
     assert responses.calls[0].request.headers["X-API-Key"] == "dl-key"
+    # Verify content type was included in file upload
+    body = responses.calls[0].request.body
+    assert b"application/pdf" in body
 
 
 @responses.activate
