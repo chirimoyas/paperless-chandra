@@ -6,24 +6,21 @@
 #
 # What it does:
 #   1. Creates /mnt/user/appdata/paperless-chandra/
-#   2. Writes your .env config there
-#   3. Builds the Docker image
-#   4. Creates and starts the container
-#
-# BEFORE RUNNING:
-#   - Edit the 3 values in the CONFIG section below
-#   - That's it. Everything else is automatic.
+#   2. Clones the repo from GitHub
+#   3. Writes your .env config (edit the 2 values below)
+#   4. Builds the Docker image
+#   5. Creates and starts the container
 #
 
 set -euo pipefail
 
 # ============================================================
-# CONFIG — edit these 3 values
+# EDIT THESE 2 VALUES — get from your Paperless-NGX settings
+# and your Datalab dashboard
 # ============================================================
 
-PAPERLESS_API_TOKEN="PUT_YOUR_PAPERLESS_API_TOKEN_HERE"
-DATALAB_API_KEY="PUT_YOUR_DATALAB_API_KEY_HERE"
-PAPERLESS_URL="http://192.168.1.145:8000"
+PAPERLESS_API_TOKEN="YOUR_PAPERLESS_API_TOKEN"
+DATALAB_API_KEY="YOUR_DATALAB_API_KEY"
 
 # ============================================================
 # You shouldn't need to change anything below
@@ -33,9 +30,9 @@ APPDIR="/mnt/user/appdata/paperless-chandra"
 REPO_DIR="$APPDIR/repo"
 IMAGE_NAME="paperless-chandra:latest"
 CONTAINER_NAME="paperless-chandra"
+PAPERLESS_URL="http://192.168.1.145:8000"
 
 echo "=== paperless-chandra deploy ==="
-echo ""
 
 # Step 1: Create appdata directory
 echo "[1/5] Creating $APPDIR ..."
@@ -48,11 +45,7 @@ if [ -d "$REPO_DIR/.git" ]; then
     git pull
 else
     echo "[2/5] Cloning repo ..."
-    git clone https://github.com/chirimoyas/paperless-chandra.git "$REPO_DIR" || {
-        echo "ERROR: Could not clone. If your repo is private or named differently,"
-        echo "       manually copy the project files to $REPO_DIR"
-        exit 1
-    }
+    git clone https://github.com/chirimoyas/paperless-chandra.git "$REPO_DIR"
 fi
 
 cd "$REPO_DIR"
@@ -74,10 +67,10 @@ LOG_LEVEL=INFO
 EOF
 
 # Step 4: Build Docker image
-echo "[4/5] Building Docker image ..."
+echo "[4/5] Building Docker image (this takes a few minutes) ..."
 docker build -t "$IMAGE_NAME" "$REPO_DIR"
 
-# Step 5: Create and start container (remove old one if exists)
+# Step 5: Create and start container
 echo "[5/5] Creating container ..."
 docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
 
