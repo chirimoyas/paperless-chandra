@@ -20,8 +20,15 @@ def client(tmp_path):
 
 @responses.activate
 def test_health(client):
-    responses.add(responses.GET, "http://paperless.test/api/", json={"version": "2.0"}, status=200)
-    assert client.health()["version"] == "2.0"
+    responses.add(
+        responses.GET,
+        "http://paperless.test/api/documents/",
+        json={"count": 92, "results": []},
+        status=200,
+    )
+    result = client.health()
+    assert result["status"] == "ok"
+    assert result["count"] == 92
 
 
 @responses.activate

@@ -38,9 +38,16 @@ class PaperlessClient:
         return f"{self.base_url}/api/{path}"
 
     def health(self) -> dict[str, Any]:
-        r = self.session.get(f"{self.base_url}/api/", headers=self.headers, timeout=self.timeout)
+        # Hit /api/documents/?limit=1 instead of /api/ — Paperless redirects
+        # /api/ to /api/schema/view/ which 406s on Accept: application/json.
+        r = self.session.get(
+            self._url("documents/"),
+            headers=self.headers,
+            params={"limit": 1},
+            timeout=self.timeout,
+        )
         r.raise_for_status()
-        return r.json()
+        return {"status": "ok", "count": r.json().get("count", 0)}
 
     def list_documents(
         self,
