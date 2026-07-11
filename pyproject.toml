@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chandra-paperless"
+version = "0.1.0"
+description = "Re-OCR Paperless-NGX documents with Chandra 2 via a vLLM backend"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31",
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "python-dotenv>=1.0",
+    "pyyaml>=6.0",
+    "pymupdf>=1.23",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "responses>=0.24",
+    "httmock>=1.4",
+    "ruff>=0.1",
+]
+
+[project.scripts]
+chandra-paperless = "chandra_paperless.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.chandra-paperless]
+# Example default config section; real values come from .env or env vars.
+paperless_base_url = "http://localhost:8000"
+chandra_base_url = "http://localhost:8000/v1"
+chandra_model = "chandra"
+poll_interval = 60
+tag_chandra_ocr = "chandra-ocr"
+processed_tag = "chandra-processed"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP", "B", "C4"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-v"

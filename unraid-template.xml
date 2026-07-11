@@ -1,0 +1,110 @@
+{
+  "Name": "paperless-chandra",
+  "Registry": "local/paperless-chandra",
+  "Source": "https://github.com/chirimoyas/paperless-chandra",
+  "Description": "Re-OCR Paperless-NGX documents with Chandra 2 via Datalab API. Polls Paperless for tagged documents, downloads originals, sends to Chandra 2 for high-quality OCR, patches content back into Paperless-NGX. Paperless-AI picks up the improved text on its next pass.",
+  "Overview": "Chandra 2 OCR integration for Paperless-NGX. Uses the Datalab hosted API (no GPU needed). Create a 'chandra-ocr' tag in Paperless-NGX and tag documents you want re-OCR'd. The script handles the rest automatically.",
+  "Category": [
+    "Productivity:Tools",
+    "MediaServer:Other"
+  ],
+  "Icon": "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/resources/logo/web/png/symbol_color_256x256.png",
+  "Repo": "local",
+  "Requires": "Paperless-NGX must be running and accessible from this container. A Datalab API key is required (sign up at datalab.to for $5 free credits).",
+  "Privileged": false,
+  "Networking": {
+    "Mode": "bridge"
+  },
+  "Env": [
+    {
+      "Name": "PAPERLESS_BASE_URL",
+      "Description": "Paperless-NGX URL (e.g. http://192.168.1.145:8000)",
+      "Default": "http://localhost:8000",
+      "Required": true,
+      "Mask": false
+    },
+    {
+      "Name": "PAPERLESS_API_TOKEN",
+      "Description": "Paperless-NGX API token (Settings > Tokens)",
+      "Default": "",
+      "Required": true,
+      "Mask": true
+    },
+    {
+      "Name": "CHANDRA_API_KEY",
+      "Description": "Datalab API key from datalab.to dashboard",
+      "Default": "",
+      "Required": true,
+      "Mask": true
+    },
+    {
+      "Name": "CHANDRA_BACKEND",
+      "Description": "datalab or vllm (auto-detects from URL)",
+      "Default": "datalab",
+      "Required": false,
+      "Mask": false
+    },
+    {
+      "Name": "CHANDRA_BASE_URL",
+      "Description": "Datalab API URL or vLLM server URL",
+      "Default": "https://www.datalab.to",
+      "Required": false,
+      "Mask": false
+    },
+    {
+      "Name": "TAG_CHANDRA_OCR",
+      "Description": "Paperless tag that selects docs for re-OCR",
+      "Default": "chandra-ocr",
+      "Required": false,
+      "Mask": false
+    },
+    {
+      "Name": "PROCESSED_TAG",
+      "Description": "Idempotency tag (skip docs already processed)",
+      "Default": "chandra-processed",
+      "Required": false,
+      "Mask": false
+    },
+    {
+      "Name": "POLL_INTERVAL",
+      "Description": "Seconds between polls",
+      "Default": "60",
+      "Required": false,
+      "Mask": false
+    },
+    {
+      "Name": "SKIP_NATIVE_TEXT_PDFS",
+      "Description": "Skip PDFs that already have embedded text",
+      "Default": "true",
+      "Required": false,
+      "Mask": false
+    },
+    {
+      "Name": "DRY_RUN",
+      "Description": "Log only, do not update Paperless-NGX",
+      "Default": "false",
+      "Required": false,
+      "Mask": false
+    },
+    {
+      "Name": "LOG_LEVEL",
+      "Description": "DEBUG, INFO, WARNING, ERROR",
+      "Default": "INFO",
+      "Required": false,
+      "Mask": false
+    }
+  ],
+  "Labels": {
+    "net.unraid.docker.managed": "composeman",
+    "net.unraid.docker.webui": "http://[IP]:[PORT:8080]/"
+  },
+  "Data": [
+    {
+      "Name": "config",
+      "Description": "Config volume (optional .env or JSON config)",
+      "Path": "/config",
+      "Default": "/mnt/user/appdata/paperless-chandra",
+      "Mode": "rw"
+    }
+  ]
+}
